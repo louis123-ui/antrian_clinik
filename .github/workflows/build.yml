@@ -1,4 +1,4 @@
-name: "Publish"
+name: "Build App (.exe & .apk)"
 
 on:
   push:
@@ -6,44 +6,38 @@ on:
 
 jobs:
   build-windows:
-    permissions:
-      contents: write
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [windows-latest]
-    runs-on: ${{ matrix.platform }}
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - name: setup node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: install dependencies
+      - name: Install Dependencies
         run: npm install
-      - uses: tauri-apps/tauri-action@v0
+      - name: Build Tauri Windows (.exe)
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-android:
-    permissions:
-      contents: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: setup java
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'templum'
+          distribution: 'temurin'
           java-version: '17'
-      - name: setup node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: install dependencies
+      - name: Install Dependencies
         run: npm install
-      - uses: tauri-apps/tauri-action@v0
+      - name: Build Tauri Android (.apk)
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: "" # Tambahkan argumen target android jika diperlukan oleh setup Tauri v2 Anda
+          args: "--target android"
